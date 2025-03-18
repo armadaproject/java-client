@@ -22,6 +22,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
+import io.grpc.stub.StreamObserver;
 import java.util.Iterator;
 
 public class ArmadaClient implements AutoCloseable {
@@ -66,6 +67,12 @@ public class ArmadaClient implements AutoCloseable {
   public Iterator<EventStreamMessage> getEvents(JobSetRequest jobSetRequest) {
     EventGrpc.EventBlockingStub eventBlockingStub = EventGrpc.newBlockingStub(channel);
     return eventBlockingStub.getJobSetEvents(jobSetRequest);
+  }
+
+  public void streamEvents(JobSetRequest jobSetRequest,
+      StreamObserver<EventStreamMessage> streamObserver) {
+    EventGrpc.EventStub eventStub = EventGrpc.newStub(channel);
+    eventStub.getJobSetEvents(jobSetRequest, streamObserver);
   }
 
   public Queue getQueue(QueueGetRequest queueGetRequest) {
